@@ -460,7 +460,7 @@ function spawnNPC(index: number, rng: () => number): Entity {
     name: NPC_NAMES[index % NPC_NAMES.length],
     hasItem: rng() < 0.4,
     talkCooldown: 0,
-    equippedWeapon: rng() < 0.3 ? generateWeapon(rng() < 0.5 ? 'stun_baton' : 'stungun') : null,
+    equippedWeapon: rng() < 0.15 ? generateWeapon(rng() < 0.5 ? 'stun_baton' : 'phase_blade') : null,
   };
 }
 
@@ -578,7 +578,7 @@ function spawnBuildings(rng: () => number): Entity[] {
 
 function spawnItems(rng: () => number): Entity[] {
   const items: Entity[] = [];
-  const subtypes = ['substance', 'substance', 'weapon', 'cash', 'cash'];
+  const subtypes = ['substance', 'substance', 'cash', 'cash'];
   for (let i = 0; i < 300; i++) {
     items.push({
       id: 'item_' + i,
@@ -647,6 +647,7 @@ function spawnBarFightEnemies(): Entity[] {
       aiState: 'chase',
       aiTimer: 0,
       name: ['THUG', 'BRUISER', 'BRAWLER', 'PUNK', 'GOON'][Math.floor(Math.random() * 5)],
+      equippedWeapon: generateWeapon(Math.random() < 0.5 ? 'phase_blade' : (Math.random() < 0.5 ? 'stun_baton' : 'fists')),
     });
   }
   return enemies;
@@ -854,6 +855,7 @@ function initState(seed?: number): GameState {
     name: NPC_NAMES[i % NPC_NAMES.length],
     hasItem: rng() < 0.4,
     talkCooldown: 0,
+    equippedWeapon: rng() < 0.15 ? generateWeapon(rng() < 0.5 ? 'stun_baton' : 'phase_blade') : null,
   }));
 
   // Items — still scatter randomly (gameplay items don't need zone logic)
@@ -896,11 +898,11 @@ function initState(seed?: number): GameState {
     glitchIntensity: 0,
     playerDead: false, deathTimer: 0,
     inventory: {
-      cash: 200,
-      items: [generateWeapon('phase_blade'), generateWeapon('nanotech_swarm'), generateWeapon('grenade_bundle')],
-      primaryWeapon: generateWeapon('plasma_caster'),
-      secondaryWeapon: generateWeapon('stungun'),
-      activeSlot: 'primary'
+      cash: 0,
+      items: [],
+      primaryWeapon: null,
+      secondaryWeapon: null,
+      activeSlot: null
     },
     inventoryWindowOpen: false,
     lootStreamOpen: false,
@@ -981,7 +983,7 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
     buildingWindowOpen: false,
     inventoryWindowOpen: false,
     lootStreamOpen: false,
-    inventory: { cash: 200, items: [] as AdvancedWeapon[], primaryWeapon: null as AdvancedWeapon | null, secondaryWeapon: null as AdvancedWeapon | null, activeSlot: 'primary' as 'primary' | 'secondary' | null },
+    inventory: { cash: 0, items: [] as AdvancedWeapon[], primaryWeapon: null as AdvancedWeapon | null, secondaryWeapon: null as AdvancedWeapon | null, activeSlot: null as 'primary' | 'secondary' | null },
     nearbyLoot: [] as Entity[],
     bossHealth: null as number | null,
     bossMaxHealth: null as number | null,
