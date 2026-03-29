@@ -540,13 +540,30 @@ const InteriorLayer = React.memo(({ s }: { s: GameState }) => {
     dropShadowDistance: 0
   }), []);
 
+  const neonFilter = useMemo(() => new GlowFilter({ distance: 15, innerStrength: 0.5, outerStrength: 3, color: 0xff00ff }), []);
+  const cyanFilter = useMemo(() => new GlowFilter({ distance: 15, innerStrength: 0.5, outerStrength: 3, color: 0x00ffff }), []);
+
   return (
     <Container>
       <Graphics draw={bgDraw} />
       {layout.tiles.map((row, y) => (
         row.map((tile, x) => {
           let texId: TerrainTexId = TERRAIN_TEX.INT_FLOOR;
-          if (tile === 'wall') texId = TERRAIN_TEX.INT_WALL;
+          if (tile === 'floor') {
+            if (layout.theme === 'corporate') texId = TERRAIN_TEX.INT_FLOOR_CORP;
+            else if (layout.theme === 'club') texId = TERRAIN_TEX.INT_FLOOR_CLUB;
+            else if (layout.theme === 'safehouse') texId = TERRAIN_TEX.INT_FLOOR_SAFE;
+            else if (layout.theme === 'bar') texId = TERRAIN_TEX.INT_FLOOR_BAR;
+            else if (layout.theme === 'lotus') texId = TERRAIN_TEX.INT_FLOOR_LOTUS;
+          }
+          else if (tile === 'wall') {
+            texId = TERRAIN_TEX.INT_WALL;
+            if (layout.theme === 'corporate') texId = TERRAIN_TEX.INT_WALL_CORP;
+            else if (layout.theme === 'club') texId = TERRAIN_TEX.INT_WALL_CLUB;
+            else if (layout.theme === 'safehouse') texId = TERRAIN_TEX.INT_WALL_SAFE;
+            else if (layout.theme === 'bar') texId = TERRAIN_TEX.INT_WALL_BAR;
+            else if (layout.theme === 'lotus') texId = TERRAIN_TEX.INT_WALL_LOTUS;
+          }
           else if (tile === 'exit') texId = TERRAIN_TEX.INT_EXIT;
           else if (tile === 'jail_bars') texId = TERRAIN_TEX.INT_JAIL_BARS;
           
@@ -573,6 +590,17 @@ const InteriorLayer = React.memo(({ s }: { s: GameState }) => {
         else if (f.type === 'table') texId = PROP_TEX.FURN_TABLE;
         else if (f.type === 'jail_bed') texId = PROP_TEX.FURN_JAIL_BED;
         else if (f.type === 'computer') texId = PROP_TEX.FURN_COMPUTER;
+        else if (f.type === 'plant') texId = PROP_TEX.FURN_PLANT;
+        else if (f.type === 'server_rack') texId = PROP_TEX.FURN_SERVER;
+        else if (f.type === 'sofa') texId = PROP_TEX.FURN_SOFA;
+        else if (f.type === 'arcade') texId = PROP_TEX.FURN_ARCADE;
+        else if (f.type === 'neon_light') texId = PROP_TEX.FURN_NEON_LIGHT;
+
+        let filters = undefined;
+        if (USE_GLOW) {
+          if (f.type === 'neon_light') filters = [neonFilter];
+          else if (f.type === 'server_rack' || f.type === 'arcade') filters = [cyanFilter];
+        }
         
         return (
           <Sprite
@@ -582,6 +610,7 @@ const InteriorLayer = React.memo(({ s }: { s: GameState }) => {
             y={f.y * INTERIOR_TILE_SIZE}
             width={f.width * INTERIOR_TILE_SIZE}
             height={f.height * INTERIOR_TILE_SIZE}
+            filters={filters}
           />
         );
       })}

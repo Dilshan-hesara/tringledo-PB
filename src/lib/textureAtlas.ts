@@ -51,13 +51,18 @@ export const TERRAIN_TEX = {
     INT_WALL: 33,
     INT_EXIT: 34,
     INT_JAIL_BARS: 35,
-    // Unique Building Tiles
-    INT_FLOOR_CLUB: 36,
-    INT_FLOOR_CORP: 37,
-    INT_FLOOR_MART: 38,
+    
+    // Themed Interior Tiles
+    INT_FLOOR_CORP: 36,
+    INT_WALL_CORP: 37,
+    INT_FLOOR_CLUB: 38,
     INT_WALL_CLUB: 39,
-    INT_WALL_CORP: 40,
-    INT_WALL_MART: 41,
+    INT_FLOOR_SAFE: 40,
+    INT_WALL_SAFE: 41,
+    INT_FLOOR_BAR: 42,
+    INT_WALL_BAR: 43,
+    INT_FLOOR_LOTUS: 44,
+    INT_WALL_LOTUS: 45,
 } as const;
 export type TerrainTexId = typeof TERRAIN_TEX[keyof typeof TERRAIN_TEX];
 
@@ -117,15 +122,11 @@ export const PROP_TEX = {
     FURN_BAR: 21,
     FURN_JAIL_BED: 22,
     FURN_COMPUTER: 23,
-    // Unique Props
-    FURN_SERVER_RACK: 24,
-    FURN_SPEAKER: 25,
-    FURN_ARCADE: 26,
-    FURN_VENDING_INT: 27,
-    FURN_PLANT: 28,
-    FURN_WEAPON_RACK: 29,
-    FURN_SOFA: 30,
-    FURN_LAMP: 31,
+    FURN_PLANT: 24,
+    FURN_SERVER: 25,
+    FURN_SOFA: 26,
+    FURN_ARCADE: 27,
+    FURN_NEON_LIGHT: 28,
 } as const;
 export type PropTexId = typeof PROP_TEX[keyof typeof PROP_TEX];
 
@@ -436,71 +437,97 @@ function buildTerrainCanvas(): HTMLCanvasElement {
         }
     });
 
-    // 36: INT_FLOOR_CLUB
+    // 36: Corporate Floor
     tile(4, 2, ctx => {
-        ctx.fillStyle = '#0a0a10'; ctx.fillRect(0, 0, T, T);
-        ctx.fillStyle = hexA(C.magenta, 0.15);
-        for(let i=0; i<T; i+=16) {
-            for(let j=0; j<T; j+=16) {
-                if((i+j)%32 === 0) ctx.fillRect(i, j, 16, 16);
-            }
-        }
-        ctx.strokeStyle = hexA(C.cyan, 0.3); ctx.lineWidth = 1;
+        ctx.fillStyle = '#0a0d14'; ctx.fillRect(0, 0, T, T);
+        ctx.strokeStyle = '#1d2331'; ctx.lineWidth = 1;
         ctx.strokeRect(0, 0, T, T);
+        // Polished marble tiles look
+        ctx.fillStyle = 'rgba(0, 204, 255, 0.05)';
+        ctx.fillRect(8, 8, T - 16, T - 16);
+        ctx.strokeStyle = 'rgba(0, 204, 255, 0.1)';
+        ctx.strokeRect(4, 4, T - 8, T - 8);
     });
-
-    // 37: INT_FLOOR_CORP
+    // 37: Corporate Wall
     tile(5, 2, ctx => {
-        ctx.fillStyle = '#e8ebf0'; ctx.fillRect(0, 0, T, T);
-        ctx.fillStyle = '#d1d8e0'; ctx.fillRect(0, 0, T/2, T/2); ctx.fillRect(T/2, T/2, T/2, T/2);
-        ctx.strokeStyle = '#a5b1c2'; ctx.lineWidth = 1;
-        ctx.strokeRect(0, 0, T/2, T/2); ctx.strokeRect(T/2, 0, T/2, T/2);
-        ctx.strokeRect(0, T/2, T/2, T/2); ctx.strokeRect(T/2, T/2, T/2, T/2);
+        ctx.fillStyle = '#0f141d'; ctx.fillRect(0, 0, T, T);
+        // Vertical blue light panels
+        ctx.fillStyle = '#1c2431'; ctx.fillRect(4, 0, T - 8, T);
+        ctx.fillStyle = hexA(C.cyan, 0.4); ctx.fillRect(10, 0, 2, T);
+        ctx.fillRect(T - 12, 0, 2, T);
+        ctx.fillStyle = 'rgba(0, 204, 255, 0.1)';
+        ctx.fillRect(12, 10, T - 24, T - 20);
     });
-
-    // 38: INT_FLOOR_MART
+    // 38: Club Floor
     tile(6, 2, ctx => {
-        ctx.fillStyle = '#dcdde1'; ctx.fillRect(0, 0, T, T);
-        ctx.fillStyle = '#7f8fa6';
-        for (let y = 0; y < T; y += 8) {
-            for (let x = 0; x < T; x += 8) {
-                if ((x+y)%16 === 0) ctx.fillRect(x, y, 8, 8);
+        ctx.fillStyle = '#050010'; ctx.fillRect(0, 0, T, T);
+        ctx.strokeStyle = hexA(C.magenta, 0.4); ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, T, T);
+        ctx.fillStyle = hexA(C.purple, 0.2); ctx.fillRect(T / 4, T / 4, T / 2, T / 2);
+    });
+    // 39: Club Wall
+    tile(7, 2, ctx => {
+        ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, T, T);
+        ctx.strokeStyle = hexA(C.magenta, 0.6); ctx.lineWidth = 3;
+        ctx.strokeRect(4, 4, T - 8, T - 8);
+        ctx.fillStyle = '#220022'; ctx.fillRect(10, 10, T - 20, T - 20);
+    });
+    // 40: Safehouse Floor
+    tile(8, 2, ctx => {
+        ctx.fillStyle = '#2a1a0f'; ctx.fillRect(0, 0, T, T);
+        ctx.strokeStyle = '#1a0f05'; ctx.lineWidth = 2;
+        for (let y = 0; y < T; y += 12) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(T, y); ctx.stroke();
+        }
+    });
+    // 41: Safehouse Wall
+    tile(9, 2, ctx => {
+        ctx.fillStyle = '#3a3a35'; ctx.fillRect(0, 0, T, T);
+        ctx.fillStyle = '#222'; ctx.fillRect(0, T - 8, T, 8);
+    });
+    // 42: Bar Floor
+    tile(10, 2, ctx => {
+        ctx.fillStyle = '#1f1515'; ctx.fillRect(0, 0, T, T);
+        ctx.strokeStyle = '#0a0a0a'; ctx.lineWidth = 1;
+        ctx.strokeRect(0, 0, T, T);
+        noise(ctx, T, T, '#000000', 0.2);
+    });
+    // 43: Bar Wall
+    tile(11, 2, ctx => {
+        ctx.fillStyle = '#2a0a0a'; ctx.fillRect(0, 0, T, T);
+        for (let y = 0; y < T; y += 10) {
+            for (let x = (y % 20 === 0 ? 0 : -10); x < T; x += 20) {
+                ctx.strokeStyle = '#1a0505'; ctx.lineWidth = 1;
+                ctx.strokeRect(x, y, 20, 10);
             }
         }
     });
-
-    // 39: INT_WALL_CLUB
-    tile(7, 2, ctx => {
-        ctx.fillStyle = '#111'; ctx.fillRect(0, 0, T, T);
-        const g = ctx.createLinearGradient(0,0,0,T);
-        g.addColorStop(0, hexA(C.magenta, 0.4)); g.addColorStop(1, '#111');
-        ctx.fillStyle = g; ctx.fillRect(0, 0, T, T);
-        // Speakers / panels
-        ctx.fillStyle = '#050505'; ctx.fillRect(T/2 - 12, T/2 - 20, 24, 40);
-        ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.strokeRect(T/2 - 12, T/2 - 20, 24, 40);
-        ctx.beginPath(); ctx.arc(T/2, T/2 - 8, 6, 0, Math.PI*2); ctx.stroke();
-        ctx.beginPath(); ctx.arc(T/2, T/2 + 8, 8, 0, Math.PI*2); ctx.stroke();
+    // 44: Lotus Floor
+    tile(12, 2, ctx => {
+        ctx.fillStyle = '#f0f4f8'; ctx.fillRect(0, 0, T, T);
+        ctx.strokeStyle = '#e0e6ed'; ctx.lineWidth = 1;
+        ctx.strokeRect(0, 0, T, T);
+        // Pink lotus pattern
+        ctx.fillStyle = 'rgba(255, 105, 180, 0.1)';
+        ctx.beginPath();
+        ctx.moveTo(T / 2, T / 4);
+        ctx.lineTo(T * 0.75, T / 2);
+        ctx.lineTo(T / 2, T * 0.75);
+        ctx.lineTo(T / 4, T / 2);
+        ctx.closePath();
+        ctx.fill();
     });
-
-    // 40: INT_WALL_CORP
-    tile(8, 2, ctx => {
-        ctx.fillStyle = '#e5eaef'; ctx.fillRect(0, 0, T, T);
-        ctx.fillStyle = '#8ca3b8'; ctx.fillRect(0, T - 12, T, 12); // Baseboard
-        ctx.strokeStyle = '#c4d1de'; ctx.lineWidth = 2;
-        ctx.strokeRect(4, 4, T/2 - 6, T - 20);
-        ctx.strokeRect(T/2 + 2, 4, T/2 - 6, T - 20);
-        // Glass reflection
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.beginPath(); ctx.moveTo(8, T-24); ctx.lineTo(T/2 - 4, 8); ctx.lineTo(T/2 - 12, 8); ctx.closePath(); ctx.fill();
-    });
-
-    // 41: INT_WALL_MART
-    tile(9, 2, ctx => {
-        ctx.fillStyle = '#f5f6fa'; ctx.fillRect(0, 0, T, T);
-        // Posters / ads
-        ctx.fillStyle = hexA(C.amber, 0.8); ctx.fillRect(8, 8, T/2 - 12, T/2);
-        ctx.fillStyle = hexA(C.cyan, 0.8); ctx.fillRect(T/2 + 4, 16, T/2 - 12, T/2 + 8);
-        ctx.fillStyle = '#fff'; ctx.fillRect(10, 10, T/2 - 16, 8);
+    // 45: Lotus Wall
+    tile(13, 2, ctx => {
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, T, T);
+        // Green and pink accents
+        ctx.fillStyle = '#2ecc71'; ctx.fillRect(0, 0, T, 6);
+        ctx.fillStyle = '#ff69b4'; ctx.fillRect(0, T - 6, T, 6);
+        ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 2;
+        ctx.strokeRect(4, 10, T - 8, T - 20);
+        // Small light circle
+        ctx.fillStyle = 'rgba(255, 105, 180, 0.4)';
+        ctx.beginPath(); ctx.arc(T/2, T/2, 4, 0, Math.PI*2); ctx.fill();
     });
 
     return canvas;
@@ -931,104 +958,60 @@ function buildPropsCanvas(): HTMLCanvasElement {
         ctx.fillStyle = g; ctx.fillRect(6, 8, T - 12, 10);
     });
 
-    // 24: Server Rack
+    // 24: Plant
     tile(8, 1, ctx => {
-        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(6, 4, T - 12, T - 8);
-        ctx.fillStyle = '#222'; ctx.fillRect(4, 2, T - 8, T - 6);
-        ctx.strokeStyle = '#444'; ctx.lineWidth = 1; ctx.strokeRect(4, 2, T - 8, T - 6);
-        for(let y=6; y<T-6; y+=4) {
-            ctx.fillStyle = '#111'; ctx.fillRect(6, y, T - 12, 2);
-            if(Math.random() > 0.3) {
-                ctx.fillStyle = hexA(C.green, 0.9); ctx.fillRect(8, y, 2, 2);
-            }
-            if(Math.random() > 0.5) {
-                ctx.fillStyle = hexA(C.cyan, 0.9); ctx.fillRect(12, y, 2, 2);
-            }
-        }
+        ctx.fillStyle = '#a0522d'; ctx.fillRect(10, T - 12, 12, 12);
+        ctx.fillStyle = '#228b22';
+        ctx.beginPath(); ctx.arc(16, T - 20, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(10, T - 18, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(22, T - 18, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(16, T - 28, 6, 0, Math.PI * 2); ctx.fill();
     });
 
-    // 25: Speaker
+    // 25: Server Rack
     tile(9, 1, ctx => {
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(6, 6, T - 8, T - 8);
-        ctx.fillStyle = '#1a1a1a'; ctx.fillRect(6, 4, T - 12, T - 8);
-        ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.strokeRect(6, 4, T - 12, T - 8);
-        ctx.fillStyle = '#0a0a0a';
-        ctx.beginPath(); ctx.arc(T/2, T/2 - 4, 6, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(T/2, T/2 + 6, 4, 0, Math.PI*2); ctx.fill();
-        ctx.strokeStyle = '#222'; ctx.stroke();
+        ctx.fillStyle = '#111'; ctx.fillRect(4, 4, T - 8, T - 8);
+        ctx.fillStyle = '#222'; ctx.fillRect(6, 6, T - 12, T - 12);
+        ctx.fillStyle = '#0f0';
+        for (let y = 10; y < T - 10; y += 6) {
+           if (Math.random() > 0.5) ctx.fillRect(8, y, 4, 2);
+           if (Math.random() > 0.5) ctx.fillRect(14, y, 4, 2);
+           ctx.fillStyle = (Math.random() > 0.8) ? '#f00' : '#0f0';
+        }
     });
 
-    // 26: Arcade Machine
+    // 26: Sofa
     tile(10, 1, ctx => {
-        ctx.fillStyle = '#2c3e50'; ctx.fillRect(6, 4, T - 12, T - 8);
-        ctx.fillStyle = '#34495e'; ctx.fillRect(8, 6, T - 16, T - 20); // Screen area
-        ctx.fillStyle = hexA(C.magenta, 0.8); ctx.fillRect(10, 8, T - 20, T - 24); // Screen glow
-        ctx.fillStyle = '#111'; ctx.fillRect(6, T - 14, T - 12, 6); // Control panel
-        ctx.fillStyle = hexA(C.cyan, 0.9); ctx.beginPath(); ctx.arc(10, T - 11, 2, 0, Math.PI*2); ctx.fill(); // Joystick
-        ctx.fillStyle = hexA(C.amber, 0.9); ctx.fillRect(16, T - 12, 2, 2); // Button
-        ctx.fillRect(20, T - 12, 2, 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(4, 4, T - 8, T - 8);
+        ctx.fillStyle = '#800020';
+        ctx.fillRect(4, 4, T - 8, T - 12);
+        ctx.fillStyle = '#600010'; ctx.fillRect(6, T - 16, T - 12, 8);
+        ctx.fillStyle = '#500005'; ctx.fillRect(4, 8, 4, T - 16);
+        ctx.fillRect(T - 8, 8, 4, T - 16);
     });
 
-    // 27: Vending Machine Int
+    // 27: Arcade Machine
     tile(11, 1, ctx => {
-        ctx.fillStyle = '#c0392b'; ctx.fillRect(6, 2, T - 12, T - 4);
-        ctx.fillStyle = '#fff'; ctx.fillRect(8, 6, T - 22, T - 16); // Glass
-        // Drinks
-        for(let y=8; y<T-10; y+=4) {
-            for(let x=10; x<T-16; x+=4) {
-                ctx.fillStyle = hexA([C.cyan, C.green, C.amber][(x+y)%3], 0.8);
-                ctx.fillRect(x, y, 2, 3);
-            }
-        }
-        ctx.fillStyle = '#333'; ctx.fillRect(T - 12, 6, 4, T - 12); // Coin slot area
-        ctx.fillStyle = '#111'; ctx.fillRect(8, T - 8, T - 16, 4); // Dispenser
+        ctx.fillStyle = '#111'; ctx.fillRect(6, 4, T - 12, T - 8);
+        ctx.fillStyle = '#333'; ctx.fillRect(8, 6, T - 16, 6);
+        ctx.fillStyle = hexA(C.cyan, 0.8); ctx.fillRect(10, 6, T - 20, 4);
+        ctx.fillStyle = '#000'; ctx.fillRect(8, 14, T - 16, T - 24);
+        ctx.fillStyle = hexA(C.magenta, 0.8); ctx.fillRect(10, 16, T - 20, T - 28);
+        ctx.fillStyle = '#555'; ctx.fillRect(6, T - 12, T - 12, 6);
+        ctx.fillStyle = '#f00'; ctx.beginPath(); ctx.arc(10, T - 9, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#00f'; ctx.beginPath(); ctx.arc(T - 10, T - 9, 2, 0, Math.PI * 2); ctx.fill();
     });
 
-    // 28: Plant
+    // 28: Neon Light
     tile(12, 1, ctx => {
-        ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath(); ctx.arc(T/2, T/2+6, 8, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#8e44ad'; ctx.fillRect(T/2 - 6, T/2 + 2, 12, 10); // Pot
-        ctx.fillStyle = '#2ecc71';
-        // Leaves
-        for(let i=0; i<5; i++) {
-            const angle = Math.PI + (i * Math.PI/4);
-            ctx.beginPath();
-            ctx.moveTo(T/2, T/2 + 2);
-            ctx.quadraticCurveTo(T/2 + Math.cos(angle)*12, T/2 + Math.sin(angle)*12, T/2 + Math.cos(angle)*8, T/2 + Math.sin(angle)*16);
-            ctx.fill();
-        }
-    });
-
-    // 29: Weapon Rack
-    tile(13, 1, ctx => {
-        ctx.fillStyle = '#2d3436'; ctx.fillRect(4, 4, T - 8, T - 8);
-        ctx.strokeStyle = '#636e72'; ctx.lineWidth = 1; ctx.strokeRect(4, 4, T - 8, T - 8);
-        ctx.fillStyle = '#d63031'; ctx.fillRect(6, 6, 20, 4); // Big gun 1
-        ctx.fillStyle = '#0984e3'; ctx.fillRect(6, 14, 16, 4); // Big gun 2
-        ctx.fillStyle = '#fdcb6e'; ctx.fillRect(6, 22, 10, 3); // Handgun
-        ctx.fillRect(18, 22, 10, 3); // Handgun
-    });
-
-    // 30: Sofa
-    tile(14, 1, ctx => {
-        ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(4, 8, T - 8, T - 12);
-        ctx.fillStyle = '#c0392b'; ctx.fillRect(2, 6, T - 4, T - 12); // Base
-        ctx.fillStyle = '#e74c3c'; ctx.fillRect(4, 10, T - 8, T - 18); // Seats
-        ctx.fillStyle = '#922b21'; ctx.fillRect(2, 6, T - 4, 6); // Backrest
-        ctx.fillRect(2, 6, 6, T - 12); // Arm left
-        ctx.fillRect(T - 8, 6, 6, T - 12); // Arm right
-    });
-
-    // 31: Lamp
-    tile(15, 1, ctx => {
-        // Glow
-        const g = ctx.createRadialGradient(T/2, T/2, 0, T/2, T/2, 16);
-        g.addColorStop(0, hexA(C.yellow, 0.4)); g.addColorStop(1, 'transparent');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(T/2, T/2, 16, 0, Math.PI*2); ctx.fill();
-        // Base
-        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(T/2, T/2, 5, 0, Math.PI*2); ctx.fill();
-        // Bulb
-        ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(T/2, T/2, 3, 0, Math.PI*2); ctx.fill();
+        const g = ctx.createLinearGradient(0, T/2 - 10, 0, T/2 + 10);
+        g.addColorStop(0, 'rgba(255, 0, 255, 0)');
+        g.addColorStop(0.5, 'rgba(255, 0, 255, 0.8)');
+        g.addColorStop(1, 'rgba(255, 0, 255, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(4, T/2 - 8, T - 8, 16);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(8, T/2 - 1, T - 16, 2);
     });
 
     return canvas;
