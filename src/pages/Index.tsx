@@ -19,6 +19,9 @@ import LoginScreen from '@/components/LoginScreen';
 import CreditsPage from '@/components/CreditsPage';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import OrientationPrompt from '@/components/OrientationPrompt';
+import GameMenu from '@/components/GameMenu';
+import { toggleFullscreen as sharedToggleFullscreen } from '@/lib/utils';
 
 // ── Shared button helpers ─────────────────────────────────────────────────────
 const btnStyle = (color: string) => ({
@@ -148,33 +151,8 @@ function LandingScreen({
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const toggleFullscreen = useCallback(async () => {
-    try {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-      const isStandalone = ('standalone' in window.navigator) && (window.navigator as any).standalone;
-
-      if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-          await elem.requestFullscreen();
-        } else if ((elem as any).webkitRequestFullscreen) {
-          await (elem as any).webkitRequestFullscreen();
-        } else if (isIOS && !isStandalone) {
-          onShowDialog({
-            isOpen: true,
-            title: 'iOS FULLSCREEN',
-            message: "To play in True Fullscreen on iOS:\n1. Tap the Safari Share icon.\n2. Tap 'Add to Home Screen'.\n3. Launch PB1 from your home screen!",
-            type: 'alert'
-          });
-        }
-      } else {
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
-        } else if ((document as any).webkitExitFullscreen) {
-          await (document as any).webkitExitFullscreen();
-        }
-      }
-    } catch (e) {
-      console.error("Fullscreen toggle failed", e);
+    const success = await sharedToggleFullscreen();
+    if (!success) {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
       if (isIOS) {
         onShowDialog({
@@ -927,6 +905,13 @@ export default function Index() {
       />
       {hudData.rageMode && <div className="rage-overlay" />}
 
+      {hudData.activeDialogue && <DialogueSystem node={hudData.activeDialogue.node} onChoose={chooseDialogueOption} />}
+      <LootStream nearbyLoot={hudData.nearbyLoot} onTake={takeLoot} />
+      {hudData.slotMachineOpen && <SlotMachine playerCash={hudData.inventory.cash} onResult={handleSlotResult} onClose={closeSlotMachine} />}
+      
+      {/* Orientation lock prompt for mobile */}
+      <OrientationPrompt />
+
       <CustomDialog dialog={dialog} onClose={() => setDialog(null)} />
 
       {hudData.inventoryWindowOpen && (
@@ -935,13 +920,6 @@ export default function Index() {
           onClose={closeInventory} 
           onEquip={equipItem} 
           onDiscard={discardItem} 
-        />
-      )}
-
-      {hudData.lootStreamOpen && (
-        <LootStream 
-          nearbyLoot={hudData.nearbyLoot} 
-          onTake={takeLoot} 
         />
       )}
 
@@ -969,17 +947,16 @@ export default function Index() {
         nearVehicle={hudData.nearVehicle}
       />
 
-
-      {hudData.activeDialogue && (
-        <DialogueSystem node={hudData.activeDialogue.node} onChoose={chooseDialogueOption} />
-      )}
-
       {hudData.buildingWindowOpen && hudData.nearBuilding && (
         <BuildingInteractionWindow
           buildingName={hudData.nearBuilding.name}
           buildingType={hudData.nearBuilding.type}
           playerCash={hudData.inventory.cash}
-          playerWeapons={hudData.inventory.weapons}
+          playerWeapons={[
+            ...(hudData.inventory.primaryWeapon ? [hudData.inventory.primaryWeapon.baseId] : []),
+            ...(hudData.inventory.secondaryWeapon ? [hudData.inventory.secondaryWeapon.baseId] : []),
+            ...hudData.inventory.items.map(i => i.baseId)
+          ]}
           playerHealth={hudData.health}
           playerMaxHealth={hudData.maxHealth}
           onAction={handleBuildingAction}
@@ -1014,17 +991,19 @@ export default function Index() {
         </div>
       )}
 
-      {hudData.slotMachineOpen && (
-        <SlotMachine playerCash={hudData.inventory.cash} onResult={handleSlotResult} onClose={closeSlotMachine} />
+      {/* Mobile controls overlay over the canvas (lower layer than mission UI) */}
+      {!isPaused && (
+        <MobileControls
+          onJoystick={handleJoystick}
+          onJoystickEnd={handleJoystickEnd}
+          onAttack={performAttack}
+          onSteal={performSteal}
+          onInteract={performInteract}
+        />
       )}
-
-      <MobileControls
-        onJoystick={handleJoystick}
-        onJoystickEnd={handleJoystickEnd}
-        onAttack={performAttack}
-        onSteal={performSteal}
-        onInteract={performInteract}
-      />
+      
+      {/* Game Menu (3 dots) */}
+      <GameMenu onExit={handleExitToMenu} />
 
       {hudData.playerDead && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none"

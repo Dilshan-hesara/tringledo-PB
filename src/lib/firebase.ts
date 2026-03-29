@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
 import { getAuth, signInAnonymously } from 'firebase/auth';
 
+
 const firebaseConfig = {
     projectId: "pansil-breaker-1",
     appId: "1:982144814430:web:7616f63fb53dd67d3e93cf",

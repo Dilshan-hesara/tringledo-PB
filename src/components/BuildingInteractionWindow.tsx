@@ -41,9 +41,9 @@ const BUILDING_CONFIGS: Record<BuildingType, { title: string; icon: string; colo
     color: '#ff9900',
     actions: [
       { label: 'Buy Medkit', description: 'Restore health (+50 HP)', path: 'clean', icon: '💊', cost: 100, healthChange: 50 },
-      { label: 'Buy Blade', description: 'A sharp combat knife', path: 'neutral', icon: '🔪', cost: 200, weapon: 'blade', scoreChange: 20 },
+      { label: 'Buy Blade', description: 'A sharp combat knife', path: 'neutral', icon: '🔪', cost: 200, weapon: 'phase_blade', scoreChange: 20 },
       { label: 'Buy Stun Gun', description: 'Non-lethal takedown tool', path: 'neutral', icon: '⚡', cost: 350, weapon: 'stungun', scoreChange: 30 },
-      { label: 'Buy Plasma Cutter', description: 'Military-grade weapon', path: 'chaos', icon: '🔫', cost: 600, weapon: 'plasma', precept: 'violence', preceptAmount: 5, heatChange: 1, scoreChange: 50 },
+      { label: 'Buy Plasma Cutter', description: 'Military-grade weapon', path: 'chaos', icon: '🔫', cost: 600, weapon: 'plasma_caster', precept: 'violence', preceptAmount: 5, heatChange: 1, scoreChange: 50 },
       { label: 'Shoplift', description: 'Steal random merchandise', path: 'chaos', icon: '🤏', precept: 'theft', preceptAmount: 12, heatChange: 1, scoreChange: 150 },
       { label: 'Rob Register', description: 'Hold up the cashier', path: 'chaos', icon: '💰', precept: 'violence', preceptAmount: 15, heatChange: 2, scoreChange: 300 },
     ],
