@@ -15,7 +15,7 @@ import {
   ZONE_NAMES,
   ZONE_ACCENT_HEX,
 } from '../lib/worldGenerator';
-import { InteriorState, INTERIOR_LAYOUTS, INTERIOR_TILE_SIZE } from '../data/interiors';
+import { InteriorState, INTERIOR_LAYOUTS, INTERIOR_TILE_SIZE, generateProceduralInterior } from '../data/interiors';
 // Re-export so GameCanvas can use zone helpers without importing worldGenerator directly
 export { getZoneAt, ZONE_NAMES, ZONE_ACCENT_HEX };
 export type { ZoneId };
@@ -245,6 +245,7 @@ export interface GameState {
   slotMachineOpen: boolean;
   hideTimer: number;
   activeInterior: InteriorState | null;
+  interiors: Record<string, InteriorState>;
   // Terrain
   terrainGrid: Uint8Array; // flat: index = y * GRID_COLS + x, value = TerrainType
   zoneGrid: Uint8Array;    // flat: index = y * GRID_COLS + x, value = ZoneId (0–5)
@@ -265,6 +266,8 @@ export interface GameState {
   remoteNPCs?: Entity[];
   remoteVehicles?: Record<string, any>;
   damageEvents?: any[];
+  remoteInteriors?: Record<string, InteriorState>;
+  syncInterior?: (buildingId: string, interior: InteriorState) => void;
   isPaused: boolean;
 }
 
@@ -923,6 +926,7 @@ function initState(seed?: number): GameState {
     slotMachineOpen: false,
     hideTimer: 0,
     activeInterior: null,
+    interiors: {},
     isPaused: false,
     terrainGrid,
     zoneGrid,
@@ -933,7 +937,7 @@ function initState(seed?: number): GameState {
 // ── Hook ───────────────────────────────────────────────────────────────────────
 export function useGameEngine(worldId?: string, worldName?: string, loadedState?: Partial<GameState> | null) {
   const playerId = useMemo(() => uid(), []);
-  const { roomCode, isHost, worldSeed, remotePlayers, remoteNPCs, remoteVehicles, pickedUpItems, damageEvents, createWorld, joinWorld, leaveWorld, syncPlayer, syncNPCs, syncVehicles, updateVehicleSeat, sendVehiclePhysics, syncItemPickup, sendDamageEvent, clearDamageEvent } = useMultiplayer(playerId);
+  const { roomCode, isHost, worldSeed, remotePlayers, remoteNPCs, remoteVehicles, pickedUpItems, damageEvents, createWorld, joinWorld, leaveWorld, syncPlayer, syncNPCs, syncVehicles, updateVehicleSeat, sendVehiclePhysics, syncItemPickup, sendDamageEvent, clearDamageEvent, remoteInteriors, syncInterior } = useMultiplayer(playerId);
 
   // Helper to re-sync vehicle occupancy if the player was in a vehicle in the loaded state
   const syncLoadedVehicle = (s: GameState) => {
@@ -1018,8 +1022,10 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
       stateRef.current.syncVehicles = syncVehicles;
       stateRef.current.updateVehicleSeat = updateVehicleSeat;
       stateRef.current.sendVehiclePhysics = sendVehiclePhysics;
+      stateRef.current.remoteInteriors = remoteInteriors;
+      stateRef.current.syncInterior = syncInterior;
     }
-  }, [isHost, syncPlayer, syncNPCs, syncVehicles, updateVehicleSeat, sendVehiclePhysics, syncItemPickup, sendDamageEvent, clearDamageEvent, remotePlayers, remoteNPCs, remoteVehicles, damageEvents, playerId]);
+  }, [isHost, syncPlayer, syncNPCs, syncVehicles, updateVehicleSeat, sendVehiclePhysics, syncItemPickup, sendDamageEvent, clearDamageEvent, remotePlayers, remoteNPCs, remoteVehicles, damageEvents, remoteInteriors, syncInterior, playerId]);
 
   // Handle vehicle seat restoration on reload
   useEffect(() => {
@@ -1464,26 +1470,43 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
     // 3. Buildings
     if (s.nearBuilding && s.nearBuilding.entity.buildingType) {
       const bType = s.nearBuilding.entity.buildingType;
-      if (bType && INTERIOR_LAYOUTS[bType]) {
-        const layout = INTERIOR_LAYOUTS[bType];
-        s.activeInterior = {
-          ...layout,
-          buildingId: s.nearBuilding.entity.id,
+      const bId = s.nearBuilding.entity.id;
+      
+      // Try to get layout from remote (multiplayer) or local cache
+      let layout = (s.remoteInteriors && s.remoteInteriors[bId]) || s.interiors[bId];
+      
+      if (!layout) {
+        // We use a deterministic seed based on worldSeed + building ID
+        const seedStr = `${s.worldSeed}_${bId}`;
+        let hash = 0;
+        for (let i = 0; i < seedStr.length; i++) hash = Math.imul(31, hash) + seedStr.charCodeAt(i) | 0;
+        
+        const newLayout = generateProceduralInterior(bId, bType, hash);
+        layout = {
+          ...newLayout,
+          buildingId: bId,
           playerOutsidePos: { x: p.x, y: p.y }
-        };
-        // Teleport to interior spawn
-        p.x = layout.spawnX * INTERIOR_TILE_SIZE + INTERIOR_TILE_SIZE / 2;
-        p.y = layout.spawnY * INTERIOR_TILE_SIZE + INTERIOR_TILE_SIZE / 2;
-        p.vx = 0; p.vy = 0;
-        s.cameraX = p.x;
-        s.cameraY = p.y;
-        s.nearBuilding = null; // Clear so we don't immediately interact again
-        s.buildingWindowOpen = false;
-        sfxRef.current?.('ui_open');
-        return;
+        } as InteriorState;
+        
+        s.interiors[bId] = layout;
+        if (s.syncInterior) {
+          s.syncInterior(bId, layout);
+        }
+      } else {
+        // Update player outside position in the cached format before entering
+        layout = { ...layout, playerOutsidePos: { x: p.x, y: p.y } };
+        s.interiors[bId] = layout;
       }
-
-      s.buildingWindowOpen = true;
+      
+      s.activeInterior = layout;
+      // Teleport to interior spawn
+      p.x = layout.spawnX * INTERIOR_TILE_SIZE + INTERIOR_TILE_SIZE / 2;
+      p.y = layout.spawnY * INTERIOR_TILE_SIZE + INTERIOR_TILE_SIZE / 2;
+      p.vx = 0; p.vy = 0;
+      s.cameraX = p.x;
+      s.cameraY = p.y;
+      s.nearBuilding = null; // Clear so we don't immediately interact again
+      s.buildingWindowOpen = false;
       sfxRef.current?.('ui_open');
       return;
     }

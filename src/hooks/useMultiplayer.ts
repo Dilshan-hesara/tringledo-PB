@@ -32,6 +32,7 @@ export function useMultiplayer(playerId: string) {
     const [remoteVehicles, setRemoteVehicles] = useState<Record<string, any>>({});
     const [pickedUpItems, setPickedUpItems] = useState<string[]>([]);
     const [damageEvents, setDamageEvents] = useState<DamageEvent[]>([]);
+    const [remoteInteriors, setRemoteInteriors] = useState<Record<string, any>>({});
 
     const isHostRef = useRef(false);
     const remotePlayerCountRef = useRef(0);
@@ -96,6 +97,7 @@ export function useMultiplayer(playerId: string) {
         setRemoteNPCs([]);
         setPickedUpItems([]);
         setDamageEvents([]);
+        setRemoteInteriors({});
         hasSetupDisconnectRef.current = false;
     }, [roomCode, isHost, playerId, rtdb]);
 
@@ -150,6 +152,13 @@ export function useMultiplayer(playerId: string) {
         if (!roomCode || !rtdb || !isHostRef.current) return;
         const eventRef = ref(rtdb, `rooms/${roomCode}/damageEvents/${eventId}`);
         remove(eventRef);
+    }, [roomCode, rtdb]);
+
+    // Sync an interior to all players
+    const syncInterior = useCallback((buildingId: string, interior: any) => {
+        if (!roomCode || !rtdb) return;
+        const interiorRef = ref(rtdb, `rooms/${roomCode}/interiors/${buildingId}`);
+        set(interiorRef, interior);
     }, [roomCode, rtdb]);
 
     // Sync NPCs (Host only)
@@ -297,12 +306,23 @@ export function useMultiplayer(playerId: string) {
             });
         }
 
+        // All players subscribe to interiors
+        const interiorsRef = ref(rtdb, `rooms/${roomCode}/interiors`);
+        const unsubInteriors = onValue(interiorsRef, (snapshot) => {
+            if (snapshot.exists()) {
+                setRemoteInteriors(snapshot.val());
+            } else {
+                setRemoteInteriors({});
+            }
+        });
+
         return () => {
             unsubPlayers();
             unsubNPCs();
             unsubPickups();
             unsubVehicles();
             unsubDamage();
+            unsubInteriors();
         };
     }, [roomCode, isHost, playerId, rtdb]);
 
@@ -325,6 +345,8 @@ export function useMultiplayer(playerId: string) {
         sendVehiclePhysics,
         syncItemPickup,
         sendDamageEvent,
-        clearDamageEvent
+        clearDamageEvent,
+        remoteInteriors,
+        syncInterior
     };
 }
