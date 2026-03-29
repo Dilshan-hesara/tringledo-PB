@@ -2584,21 +2584,24 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
         }
 
         // ── Mobile joystick acceleration / braking ─────────────────────────────
-        // joystick.y: negative = forward (accelerate), positive = backward (brake)
         const joy = s.touches.joystick;
         if (joy) {
-          if (joy.y < -0.15) {
-            // Joystick pushed up → accelerate forward along vehicle facing
-            const throttle = Math.abs(joy.y);
-            dvx += Math.cos(v.facing) * throttle;
-            dvy += Math.sin(v.facing) * throttle;
-            accelInput = true;
-          } else if (joy.y > 0.15) {
-            // Joystick pushed down → brake / reverse
-            const brakeAmt = joy.y * 0.4;
-            dvx -= Math.cos(v.facing) * brakeAmt;
-            dvy -= Math.sin(v.facing) * brakeAmt;
-            brakeInput = true;
+          const joyMag = Math.hypot(joy.x, joy.y);
+          if (joyMag > 0.15) {
+            if (joy.y < 0.15) {
+              // Forward or sideways push: Pushing ONLY left/right now provides some throttle
+              // so the car can move and turn from a stop
+              const throttle = Math.max(Math.abs(joy.y), Math.abs(joy.x) * 0.5);
+              dvx += Math.cos(v.facing) * throttle;
+              dvy += Math.sin(v.facing) * throttle;
+              accelInput = true;
+            } else if (joy.y > 0.15) {
+              // Backward push: Brake/Reverse
+              const brakeAmt = joy.y * 0.4;
+              dvx -= Math.cos(v.facing) * brakeAmt;
+              dvy -= Math.sin(v.facing) * brakeAmt;
+              brakeInput = true;
+            }
           }
         }
 
@@ -2607,8 +2610,8 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
         const isReversing = forwardDot < -0.1;
         const speedPercent = speed / (maxSpd || 1);
 
-        // Motorcycle can turn while stationary. Others need momentum.
-        const canTurn = vt === 'motorcycle' || speed > 1.0 || (speed > 0.1 && (accelInput || brakeInput));
+        // Motorcycle can turn while stationary. Others need momentum or throttle.
+        const canTurn = vt === 'motorcycle' || speed > 0.5 || (accelInput || brakeInput);
 
         // ── Keyboard steering ─────────────────────────────────────────────────
         if (canTurn && (keys.has('a') || keys.has('arrowleft') || keys.has('d') || keys.has('arrowright'))) {
