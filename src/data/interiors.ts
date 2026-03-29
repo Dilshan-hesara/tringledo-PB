@@ -22,6 +22,8 @@ export interface InteriorNPC {
   x: number;
   y: number;
   dialogue?: string[];
+  aiTimer?: number;
+  aiTarget?: { x: number; y: number } | null;
 }
 
 export interface InteriorState {
