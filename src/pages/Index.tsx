@@ -952,7 +952,11 @@ export default function Index() {
           buildingName={hudData.nearBuilding.name}
           buildingType={hudData.nearBuilding.type}
           playerCash={hudData.inventory.cash}
-          playerWeapons={hudData.inventory.weapons}
+          playerWeapons={[
+            ...(hudData.inventory.primaryWeapon ? [hudData.inventory.primaryWeapon.baseId] : []),
+            ...(hudData.inventory.secondaryWeapon ? [hudData.inventory.secondaryWeapon.baseId] : []),
+            ...hudData.inventory.items.map(i => i.baseId)
+          ]}
           playerHealth={hudData.health}
           playerMaxHealth={hudData.maxHealth}
           onAction={handleBuildingAction}
