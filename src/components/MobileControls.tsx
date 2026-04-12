@@ -52,8 +52,15 @@ export default function MobileControls({ onJoystick, onJoystickEnd, onAttack, on
   }, [onJoystickEnd]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 pointer-events-none hide-on-non-touch">
-      <div className="flex justify-between items-end px-6 pb-6 w-full pointer-events-auto">
+    <div 
+      className="fixed inset-0 z-30 pointer-events-none hide-on-non-touch flex flex-col justify-end pb-6 px-6"
+      style={{
+        paddingBottom: `calc(env(safe-area-inset-bottom, var(--sa-bottom, 0px)) + 1.5rem)`,
+        paddingLeft: `calc(env(safe-area-inset-left, var(--sa-left, 0px)) + 1.5rem)`,
+        paddingRight: `calc(env(safe-area-inset-right, var(--sa-right, 0px)) + 1.5rem)`,
+      }}
+    >
+      <div className="flex justify-between items-end w-full pointer-events-auto">
         {/* Joystick */}
         <div
           ref={joystickRef}

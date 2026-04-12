@@ -171,7 +171,13 @@ function LandingScreen({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center scanlines overflow-y-auto"
-      style={{ background: 'radial-gradient(ellipse at center, #0d0005 0%, #050005 60%, #000 100%)' }}>
+      style={{ 
+        background: 'radial-gradient(ellipse at center, #0d0005 0%, #050005 60%, #000 100%)',
+        paddingTop: `calc(env(safe-area-inset-top, var(--sa-top, 0px)))`,
+        paddingRight: `calc(env(safe-area-inset-right, var(--sa-right, 0px)))`,
+        paddingBottom: `calc(env(safe-area-inset-bottom, var(--sa-bottom, 0px)))`,
+        paddingLeft: `calc(env(safe-area-inset-left, var(--sa-left, 0px)))`,
+      }}>
 
       {/* ── Top nav bar (replaces absolute corners — wraps gracefully on mobile) */}
       {!hostedCode && !joinMode && (
@@ -498,7 +504,13 @@ function WorldsScreen({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center scanlines"
-      style={{ background: 'radial-gradient(ellipse at center, #0d0005 0%, #050005 60%, #000 100%)' }}>
+      style={{ 
+        background: 'radial-gradient(ellipse at center, #0d0005 0%, #050005 60%, #000 100%)',
+        paddingTop: `calc(env(safe-area-inset-top, var(--sa-top, 0px)))`,
+        paddingRight: `calc(env(safe-area-inset-right, var(--sa-right, 0px)))`,
+        paddingBottom: `calc(env(safe-area-inset-bottom, var(--sa-bottom, 0px)))`,
+        paddingLeft: `calc(env(safe-area-inset-left, var(--sa-left, 0px)))`,
+      }}>
 
       <div className="w-full max-w-2xl px-6">
         {/* Header */}

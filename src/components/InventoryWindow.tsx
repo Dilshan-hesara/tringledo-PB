@@ -37,7 +37,14 @@ export default function InventoryWindow({ inventory, onClose, onEquip, onDiscard
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+      style={{
+        paddingTop: `calc(env(safe-area-inset-top, var(--sa-top, 0px)) + 1rem)`,
+        paddingRight: `calc(env(safe-area-inset-right, var(--sa-right, 0px)) + 1rem)`,
+        paddingBottom: `calc(env(safe-area-inset-bottom, var(--sa-bottom, 0px)) + 1rem)`,
+        paddingLeft: `calc(env(safe-area-inset-left, var(--sa-left, 0px)) + 1rem)`,
+      }}
+    >
       <div className="w-full max-w-4xl bg-[#0a0a0a] border-2 border-[#00ccff] shadow-[0_0_30px_rgba(0,204,255,0.3)] flex flex-col md:flex-row h-full max-h-[600px] overflow-hidden">
         
         {/* Left: Loadout */}

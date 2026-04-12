@@ -72,6 +72,12 @@
     --sidebar-accent-foreground: 0 0% 80%;
     --sidebar-border: 0 30% 15%;
     --sidebar-ring: 0 90% 45%;
+
+    /* Safe Areas for Mobile Devices */
+    --sa-top: env(safe-area-inset-top, 0px);
+    --sa-right: env(safe-area-inset-right, 0px);
+    --sa-bottom: env(safe-area-inset-bottom, 0px);
+    --sa-left: env(safe-area-inset-left, 0px);
   }
 }
 
