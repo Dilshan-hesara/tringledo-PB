@@ -31,13 +31,13 @@ export default function CreditsPage({ onBack }: CreditsPageProps) {
             <div className="w-full max-w-2xl relative py-20 animate-fade-in flex flex-col items-center">
 
                 {/* Game Title */}
-                <div className="mb-20 text-center">
-                    <div className="font-display text-5xl md:text-7xl mb-2 animate-flicker"
-                        style={{ color: neonRed, textShadow: `0 0 20px ${neonRed}, 0 0 40px ${neonRed}80`, letterSpacing: '0.15em' }}>
+                <div className="mb-12 sm:mb-20 text-center">
+                    <div className="font-display text-4xl sm:text-6xl md:text-7xl mb-1 sm:mb-2 animate-flicker"
+                        style={{ color: neonRed, textShadow: `0 0 20px ${neonRed}, 0 0 40px ${neonRed}80`, letterSpacing: '0.1em' }}>
                         PANSIL
                     </div>
-                    <div className="font-display text-5xl md:text-7xl"
-                        style={{ color: neonBlue, textShadow: `0 0 20px ${neonBlue}, 0 0 40px ${neonBlue}80`, letterSpacing: '0.15em' }}>
+                    <div className="font-display text-4xl sm:text-6xl md:text-7xl"
+                        style={{ color: neonBlue, textShadow: `0 0 20px ${neonBlue}, 0 0 40px ${neonBlue}80`, letterSpacing: '0.1em' }}>
                         BREAKER
                     </div>
                 </div>
