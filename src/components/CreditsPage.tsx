@@ -64,6 +64,8 @@ export default function CreditsPage({ onBack }: CreditsPageProps) {
                     <div className={valueStyle} style={{ color: '#fff' }}>KUMAR JAYARANGA</div>
                     <div className={valueStyle} style={{ color: '#fff' }}>UDA BHAGYA</div>
                     <div className={valueStyle} style={{ color: '#fff' }}>DINUKA LAKMAL</div>
+                    <div className={valueStyle} style={{ color: '#fff' }}>DILSHAN HESARA</div>
+                    <div className={valueStyle} style={{ color: '#fff' }}>SUMUDITHA JANITH</div>
                 </div>
 
                 <div className={sectionStyle}>
