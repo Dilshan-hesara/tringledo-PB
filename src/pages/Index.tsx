@@ -48,10 +48,10 @@ function Corners() {
       {(['top-1 left-1', 'top-1 right-1', 'bottom-1 left-1', 'bottom-1 right-1'] as const).map((pos, i) => (
         <div key={i} className={`fixed ${pos} w-12 h-12`}
           style={{
-            borderTop: i < 2 ? '2px solid rgba(255,34,51,0.3)' : 'none',
-            borderBottom: i >= 2 ? '2px solid rgba(255,34,51,0.3)' : 'none',
-            borderLeft: i % 2 === 0 ? '2px solid rgba(255,34,51,0.3)' : 'none',
-            borderRight: i % 2 === 1 ? '2px solid rgba(255,34,51,0.3)' : 'none',
+            borderTop: i < 2 ? '1px solid rgba(255,34,51,0.3)' : 'none',
+            borderBottom: i >= 2 ? '1px solid rgba(255,34,51,0.3)' : 'none',
+            borderLeft: i % 2 === 0 ? '1px solid rgba(255,34,51,0.3)' : 'none',
+            borderRight: i % 2 === 1 ? '1px solid rgba(255,34,51,0.3)' : 'none',
           }}
         />
       ))}
