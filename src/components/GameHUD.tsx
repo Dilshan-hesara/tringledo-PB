@@ -47,7 +47,7 @@ export default function GameHUD({
   return (
     <>
       {/* Top-left: Chaos + Heat */}
-      <div className="absolute top-3 left-3 z-20 flex flex-col gap-2 select-none origin-top-left transform scale-75 md:scale-100">
+      <div className="absolute top-2 left-2 z-20 flex flex-col gap-1.5 select-none origin-top-left transform scale-[0.7] md:scale-100">
         {/* Score + Cash */}
         <div className="hud-panel px-3 py-1.5 rounded">
           <div className="flex items-center justify-between gap-4">
@@ -141,8 +141,8 @@ export default function GameHUD({
         )}
       </div>
 
-      {/* Top-right: Precepts (Positioned to the left of minimap on mobile) */}
-      <div className="absolute z-20 flex flex-col gap-1.5 select-none top-[10px] md:top-[230px] right-[145px] md:right-[20px] w-[160px] md:w-[200px] origin-top-right transform scale-[0.65] md:scale-100">
+      {/* Top-right: Precepts (Positioned below minimap on mobile) */}
+      <div className="absolute z-20 flex flex-col gap-1.5 select-none top-[160px] md:top-[230px] right-2 md:right-[20px] w-[160px] md:w-[200px] origin-top-right transform scale-[0.7] md:scale-100">
         <div className="hud-panel px-3 py-2 rounded">
           <div className="font-display text-xs tracking-widest mb-2 text-center" style={{ color: '#cc33ff' }}>
             ☯ PANSIL BREAKER
@@ -270,8 +270,8 @@ export default function GameHUD({
         </div>
       )}
 
-      {/* Bottom-left: Health */}
-      <div className="absolute bottom-28 left-3 z-20 select-none md:bottom-3 origin-bottom-left transform scale-75 md:scale-100">
+      {/* Bottom-left: Health (Higher on mobile to stay above joystick) */}
+      <div className="absolute bottom-32 left-2 z-20 select-none md:bottom-3 origin-bottom-left transform scale-[0.8] md:scale-100">
         <div className="hud-panel px-3 py-2 rounded">
           <div className="font-display text-xs tracking-widest mb-1" style={{ color: healthPct > 0.5 ? '#00ff88' : '#ff2233' }}>
             ♥ VITALITY

@@ -1,16 +1,1 @@
-{
-  "rules": {
-    "rooms": {
-      "$room_id": {
-        ".read": "auth != null",
-        ".write": "auth != null"
-      }
-    },
-    "users": {
-      "$uid": {
-        ".read": "$uid === auth.uid",
-        ".write": "$uid === auth.uid"
-      }
-    }
-  }
-}
+database.rules.json
