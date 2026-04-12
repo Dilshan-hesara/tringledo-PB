@@ -1,19 +1,22 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
+import { getAnalytics } from 'firebase/analytics';
 
 
 const firebaseConfig = {
-    projectId: "pansil-breaker-1",
-    appId: "1:982144814430:web:7616f63fb53dd67d3e93cf",
-    storageBucket: "pansil-breaker-1.firebasestorage.app",
-    apiKey: "AIzaSyAdPNrYOd9caQo6Su6pg9kzhP3Y7z-9IKA",
-    authDomain: "pansil-breaker-1.firebaseapp.com",
-    messagingSenderId: "982144814430",
-    databaseURL: "https://pansil-breaker-1-default-rtdb.firebaseio.com"
+    apiKey: "AIzaSyCODnkiuFxCoxcMd2IRAh3yIOZyO8M7i1M",
+    authDomain: "pansilbreaker-1.firebaseapp.com",
+    projectId: "pansilbreaker-1",
+    storageBucket: "pansilbreaker-1.firebasestorage.app",
+    messagingSenderId: "566853087070",
+    appId: "1:566853087070:web:50e4a785181f35fce529cf",
+    measurementId: "G-P93WCDCCB9",
+    databaseURL: "https://pansilbreaker-1-default-rtdb.firebaseio.com"
 };
 
 const app = initializeApp(firebaseConfig);
+export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 
 

@@ -276,13 +276,36 @@ function LandingScreen({
       {(hostedCode || joinMode) && <div className="h-8 sm:h-16 shrink-0 landing-spacer" />}
 
       {/* ── Title */}
-      <div className="flex text-center mb-6 sm:mb-8 select-none mt-2 sm:mt-4 px-4 landing-title">
-        <div className="font-display text-5xl sm:text-6xl md:text-8xl mt-4 mb-0 animate-flicker landing-title-text"
-          style={{ color: 'white', letterSpacing: '0.15em' }}>
-          PANSIL BREAKER I
+      <div className="text-center mb-6 sm:mb-8 select-none mt-2 sm:mt-4 px-4 landing-title">
+        <div className="font-display text-5xl sm:text-6xl md:text-8xl mb-2 animate-flicker landing-title-text"
+          style={{ color: '#ff2233', textShadow: '0 0 20px #ff2233, 0 0 60px rgba(255,34,51,0.5)', letterSpacing: '0.15em' }}>
+          PANSIL
+        </div>
+        <div
+          className="font-display text-5xl sm:text-6xl md:text-8xl landing-title-text"
+          style={{
+            color: '#00ccff',
+            textShadow: '0 0 20px #00ccff, 0 0 60px rgba(0,204,255,0.5)',
+            letterSpacing: '0.15em'
+          }}
+        >
+          BREAKER <span
+            style={{
+              color: '#cc33ff',
+              textShadow: '0 0 20px #cc33ff, 0 0 60px rgba(204,51,255,0.5)'
+            }}
+          >
+            I
+          </span>
         </div>
       </div>
 
+      {/* ── Tagline */}
+      <div className="font-mono-game text-center mb-6 sm:mb-10 max-w-xs sm:max-w-md px-4 landing-tagline"
+        style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, lineHeight: 1.8, letterSpacing: '0.05em' }}>
+        CHAOS ENGINE v6.7 (Public Beta)<br />FIVE PRECEPTS. ZERO MERCY.<br />
+        VIOLENCE · THEFT · MISCONDUCT · DECEPTION · INTOXICATION
+      </div>
 
 
       {/* ── Precept icons */}
@@ -381,12 +404,7 @@ function LandingScreen({
         <span className="sm:hidden">TAP JOYSTICK TO MOVE · BUTTONS TO ACT</span>
       </div>
 
-      {/* ── Tagline */}
-      <div className="font-mono-game text-center mb-6 sm:mb-10 max-w-xs sm:max-w-md px-4 landing-tagline"
-        style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, lineHeight: 1.8, letterSpacing: '0.05em' }}>
-        CHAOS ENGINE v6.7 (Public Beta)<br />FIVE PRECEPTS. ZERO MERCY.<br />
-        VIOLENCE · THEFT · MISCONDUCT · DECEPTION · INTOXICATION
-      </div>
+      
 
       <Corners />
     </div>
