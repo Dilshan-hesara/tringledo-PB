@@ -1045,7 +1045,15 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
     }
   }, [playerId, updateVehicleSeat]);
 
-  // Auto-save loop – tracks real wall-clock session time
+  // Save on game start (to cloud)
+  useEffect(() => {
+    if (worldId && stateRef.current) {
+      sessionStartRef.current = Date.now();
+      saveWorld(worldId, worldName || 'Unknown World', stateRef.current, 0, true);
+    }
+  }, [worldId]);
+
+  // Auto-save loop – every 1 minute
   useEffect(() => {
     if (!worldId) return;
     sessionStartRef.current = Date.now();
@@ -1054,8 +1062,20 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
         const sessionSeconds = (Date.now() - sessionStartRef.current) / 1000;
         saveWorld(worldId, worldName || 'Unknown World', stateRef.current, sessionSeconds);
       }
-    }, 5000);
+    }, 30000);
     return () => clearInterval(interval);
+  }, [worldId, worldName]);
+
+  // Save on game exit (page unload, to cloud)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (worldId && stateRef.current) {
+        const sessionSeconds = (Date.now() - sessionStartRef.current) / 1000;
+        saveWorld(worldId, worldName || 'Unknown World', stateRef.current, sessionSeconds, true);
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [worldId, worldName]);
 
   // Remove items picked up by other players
@@ -3349,7 +3369,7 @@ export function useGameEngine(worldId?: string, worldName?: string, loadedState?
     forceSave: () => {
       if (worldId && stateRef.current) {
         const sessionSeconds = (Date.now() - sessionStartRef.current) / 1000;
-        saveWorld(worldId, worldName || 'Unknown World', stateRef.current, sessionSeconds);
+        saveWorld(worldId, worldName || 'Unknown World', stateRef.current, sessionSeconds, true);
       }
     },
     toggleMap: () => {
