@@ -1,15 +1,51 @@
 import { useState, useEffect, useRef } from 'react';
-import { auth } from '@/lib/firebase';
+import { auth, firestore } from '@/lib/firebase';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signInAnonymously,
     updateProfile
 } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 interface LoginScreenProps {
     onLoginSuccess: () => void;
     initialMode?: 'login' | 'register';
+}
+
+const GUEST_PROFILE_KEY = 'pansil_breaker_guest_profile';
+
+async function saveUserProfile(userId: string, username: string, email: string, isOffline: boolean = false) {
+    const profileData = {
+        username,
+        email,
+        createdAt: Date.now(),
+        lastLogin: Date.now()
+    };
+
+    if (isOffline) {
+        localStorage.setItem(GUEST_PROFILE_KEY, JSON.stringify({ ...profileData, userId }));
+        return;
+    }
+
+    const docRef = doc(firestore, `users/${userId}`);
+    const existing = await getDoc(docRef);
+    const existingData = existing.exists() ? existing.data() : {};
+    
+    await setDoc(docRef, {
+        ...existingData,
+        ...profileData,
+        createdAt: existingData.createdAt || profileData.createdAt
+    }, { merge: true });
+}
+
+function getLocalGuestProfile(): { userId: string; username: string; email: string } | null {
+    try {
+        const data = localStorage.getItem(GUEST_PROFILE_KEY);
+        return data ? JSON.parse(data) : null;
+    } catch {
+        return null;
+    }
 }
 
 export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: LoginScreenProps) {
@@ -79,8 +115,16 @@ export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: L
                 }
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: username });
+                await saveUserProfile(userCredential.user.uid, username, email);
             } else {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const docRef = doc(firestore, `users/${userCredential.user.uid}`);
+                const snapshot = await getDoc(docRef);
+                if (snapshot.exists()) {
+                    await setDoc(docRef, { lastLogin: Date.now() }, { merge: true });
+                } else {
+                    await saveUserProfile(userCredential.user.uid, userCredential.user.displayName || '', email);
+                }
             }
             onLoginSuccess();
         } catch (err: any) {
@@ -95,7 +139,8 @@ export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: L
         setLoading(true);
         try {
             sessionStorage.removeItem('guest_logged_out');
-            await signInAnonymously(auth);
+            const result = await signInAnonymously(auth);
+            await saveUserProfile(result.user.uid, 'Guest', '', true);
             onLoginSuccess();
         } catch (err: any) {
             setError(err.message || 'Could not start offline session.');

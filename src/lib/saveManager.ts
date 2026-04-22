@@ -31,17 +31,20 @@ function getAllSaves(): Record<string, WorldSave> {
     return {};
 }
 
-function saveAllSaves(saves: Record<string, WorldSave>) {
+function saveAllSaves(saves: Record<string, WorldSave>, toCloud: boolean = false) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(saves));
 
+        if (!toCloud) return;
+
         const user = auth.currentUser;
         if (user && !user.isAnonymous && firestore) {
-            // Firebase rejects payloads with undefined values.
-            // stringify -> parse strips out undefined cleanly.
-            const sanitizedSaves = JSON.parse(JSON.stringify(saves));
+            const cloudSaves: Record<string, WorldSave> = {};
+            for (const [id, save] of Object.entries(saves)) {
+                cloudSaves[id] = { metadata: save.metadata };
+            }
             const docRef = doc(firestore, `users/${user.uid}`);
-            setDoc(docRef, { saves: sanitizedSaves }, { mergeFields: ['saves'] }).catch(e => {
+            setDoc(docRef, { saves: cloudSaves }, { mergeFields: ['saves'] }).catch(e => {
                 console.error('Failed to sync saves to Firestore:', e);
             });
         }
@@ -68,7 +71,8 @@ export function saveWorld(
     id: string,
     name: string,
     state: Partial<GameState>,
-    sessionSeconds: number
+    sessionSeconds: number,
+    toCloud: boolean = false
 ): WorldSave {
     const saves = getAllSaves();
 
@@ -97,7 +101,7 @@ export function saveWorld(
     };
 
     saves[id] = save;
-    saveAllSaves(saves);
+    saveAllSaves(saves, toCloud);
     return save;
 }
 
@@ -136,11 +140,9 @@ export async function fetchSavesFromFirebase(): Promise<void> {
                 if (data && data.saves) {
                     const cloudSaves = data.saves;
                     if (typeof cloudSaves === 'object' && cloudSaves !== null) {
-                        // Merge cloud saves with local saves, preferring cloud saves if conflict
+                        // Merge cloud saves with local saves, preferring local saves (has full state)
                         const currentSaves = getAllSaves();
-                        const merged = { ...currentSaves, ...cloudSaves };
-                        // Save to local storage without re-triggering Firebase upload immediately 
-                        // unless we want to sync local-only saves up (we'll just use saveAllSaves to sync both ways)
+                        const merged = { ...cloudSaves, ...currentSaves };
                         saveAllSaves(merged);
                     }
                 }
