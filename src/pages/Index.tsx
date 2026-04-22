@@ -45,8 +45,8 @@ const btnLeave = (color: string, el: HTMLButtonElement) => {
 function Corners() {
   return (
     <>
-      {(['top-4 left-4', 'top-4 right-4', 'bottom-4 left-4', 'bottom-4 right-4'] as const).map((pos, i) => (
-        <div key={i} className={`absolute ${pos} w-12 h-12`}
+      {(['top-1 left-1', 'top-1 right-1', 'bottom-1 left-1', 'bottom-1 right-1'] as const).map((pos, i) => (
+        <div key={i} className={`fixed ${pos} w-12 h-12`}
           style={{
             borderTop: i < 2 ? '1px solid rgba(255,34,51,0.3)' : 'none',
             borderBottom: i >= 2 ? '1px solid rgba(255,34,51,0.3)' : 'none',
@@ -282,17 +282,17 @@ function LandingScreen({
       {(hostedCode || joinMode) && <div className="h-8 sm:h-16 shrink-0 landing-spacer" />}
 
       {/* ── Title */}
-      <div className="text-center mb-6 sm:mb-8 select-none mt-2 sm:mt-4 px-4 landing-title">
-        <div className="font-display text-5xl sm:text-6xl md:text-8xl mb-2 animate-flicker landing-title-text"
-          style={{ color: '#ff2233', textShadow: '0 0 20px #ff2233, 0 0 60px rgba(255,34,51,0.5)', letterSpacing: '0.15em' }}>
+      <div className="text-center mb-8 sm:mb-10 select-none mt-2 sm:mt-4 px-4 landing-title">
+        <div className="font-display text-4xl sm:text-5xl md:text-8xl mb-1 sm:mb-2 animate-flicker landing-title-text"
+          style={{ color: '#ff2233', textShadow: '0 0 20px #ff2233, 0 0 60px rgba(255,34,51,0.5)', letterSpacing: '0.1em' }}>
           PANSIL
         </div>
         <div
-          className="font-display text-5xl sm:text-6xl md:text-8xl landing-title-text"
+          className="font-display text-4xl sm:text-5xl md:text-8xl landing-title-text"
           style={{
             color: '#00ccff',
             textShadow: '0 0 20px #00ccff, 0 0 60px rgba(0,204,255,0.5)',
-            letterSpacing: '0.15em'
+            letterSpacing: '0.1em'
           }}
         >
           BREAKER <span
@@ -410,7 +410,7 @@ function LandingScreen({
         <span className="sm:hidden">TAP JOYSTICK TO MOVE · BUTTONS TO ACT</span>
       </div>
 
-      
+
 
       <Corners />
     </div>
@@ -512,22 +512,33 @@ function WorldsScreen({
         paddingLeft: `calc(env(safe-area-inset-left, var(--sa-left, 0px)))`,
       }}>
 
-      <div className="w-full max-w-2xl px-6">
+      <div className="w-full max-w-2xl px-4 sm:px-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={onBack}
-            className="font-display text-sm px-4 py-2 transition-colors"
-            style={{ border: '1px solid #555', color: '#777' }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#777'; e.currentTarget.style.borderColor = '#555'; }}>
-            ← BACK
-          </button>
-          <div className="font-display text-2xl tracking-widest"
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+          <div className="flex w-full sm:w-auto justify-between items-center sm:gap-4 order-2 sm:order-1">
+            <button onClick={onBack}
+              className="font-display text-[10px] sm:text-xs px-3 sm:px-4 py-2 transition-colors"
+              style={{ border: '1px solid #555', color: '#777' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#777'; e.currentTarget.style.borderColor = '#555'; }}>
+              ← BACK
+            </button>
+            <button onClick={() => setView(view === 'settings' ? 'worlds' : 'settings')}
+              className="font-display text-[10px] sm:text-xs px-3 sm:px-4 py-2 transition-colors sm:hidden"
+              style={{ border: '1px solid #555', color: '#777' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#777'; e.currentTarget.style.borderColor = '#555'; }}>
+              {view === 'settings' ? 'WORLDS' : 'SETTINGS'}
+            </button>
+          </div>
+
+          <div className="font-display text-xl sm:text-2xl tracking-[0.2em] order-1 sm:order-2"
             style={{ color: '#00ccff', textShadow: '0 0 15px #00ccff' }}>
             {view === 'settings' ? 'SAVE DATA' : 'SELECT WORLD'}
           </div>
+
           <button onClick={() => setView(view === 'settings' ? 'worlds' : 'settings')}
-            className="font-display text-sm px-4 py-2 transition-colors"
+            className="font-display text-[10px] sm:text-xs px-4 py-2 transition-colors hidden sm:block order-3"
             style={{ border: '1px solid #555', color: '#777' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#fff'; }}
             onMouseLeave={e => { e.currentTarget.style.color = '#777'; e.currentTarget.style.borderColor = '#555'; }}>
@@ -536,10 +547,10 @@ function WorldsScreen({
         </div>
 
         {view === 'worlds' ? (
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             {/* World list */}
             <div className="flex-1 flex flex-col gap-2 border border-gray-800 p-4 bg-black/60"
-              style={{ maxHeight: 360, overflowY: 'auto' }}>
+              style={{ maxHeight: 'max(40vh, 250px)', overflowY: 'auto' }}>
               {saves.length === 0 && (
                 <div className="text-gray-600 font-mono text-sm py-8 text-center">NO SAVED WORLDS</div>
               )}
@@ -573,7 +584,7 @@ function WorldsScreen({
             </div>
 
             {/* Action panel */}
-            <div className="w-52 flex flex-col justify-between border border-gray-800 p-4 bg-black/60">
+            <div className="w-full sm:w-52 flex flex-col justify-between border border-gray-800 p-4 bg-black/60 min-h-[160px] sm:min-h-0">
               {selected ? (
                 <div className="flex flex-col gap-3 h-full">
                   <div className="font-display text-white text-xl leading-tight">{selected.name}</div>
@@ -621,20 +632,20 @@ function WorldsScreen({
           </div>
         ) : (
           /* Settings / Save Data */
-          <div className="flex flex-col gap-3 border border-gray-800 p-6 bg-black/60 max-w-sm mx-auto">
-            <div className="font-mono text-xs text-center mb-2" style={{ color: '#555' }}>
+          <div className="flex flex-col gap-3 border border-gray-800 p-6 bg-black/60 w-full max-w-sm mx-auto">
+            <div className="font-mono text-[10px] sm:text-xs text-center mb-2" style={{ color: '#555' }}>
               Export all worlds to a .json file, or import a previously exported file.
               Importing merges with existing saves.
             </div>
             <button onClick={handleExport}
-              className="py-3 border font-display transition-colors"
+              className="py-3 border font-display text-xs sm:text-sm transition-colors"
               style={{ borderColor: '#00ccff', color: '#00ccff' }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,204,255,0.1)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
               EXPORT ALL SAVES
             </button>
             <button onClick={() => fileInputRef.current?.click()}
-              className="py-3 border font-display transition-colors"
+              className="py-3 border font-display text-xs sm:text-sm transition-colors"
               style={{ borderColor: '#cc33ff', color: '#cc33ff' }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(204,51,255,0.1)'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
@@ -938,18 +949,18 @@ export default function Index() {
       {hudData.activeDialogue && <DialogueSystem node={hudData.activeDialogue.node} onChoose={chooseDialogueOption} />}
       <LootStream nearbyLoot={hudData.nearbyLoot} onTake={takeLoot} />
       {hudData.slotMachineOpen && <SlotMachine playerCash={hudData.inventory.cash} onResult={handleSlotResult} onClose={closeSlotMachine} />}
-      
+
       {/* Orientation lock prompt for mobile */}
       <OrientationPrompt />
 
       <CustomDialog dialog={dialog} onClose={() => setDialog(null)} />
 
       {hudData.inventoryWindowOpen && (
-        <InventoryWindow 
-          inventory={hudData.inventory} 
-          onClose={closeInventory} 
-          onEquip={equipItem} 
-          onDiscard={discardItem} 
+        <InventoryWindow
+          inventory={hudData.inventory}
+          onClose={closeInventory}
+          onEquip={equipItem}
+          onDiscard={discardItem}
         />
       )}
 
@@ -1031,7 +1042,7 @@ export default function Index() {
           onInteract={performInteract}
         />
       )}
-      
+
       {/* Game Menu (3 dots) */}
       <GameMenu onExit={handleExitToMenu} />
 

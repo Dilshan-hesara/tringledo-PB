@@ -146,10 +146,10 @@ export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: L
                     <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00ccff]" />
                     <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00ccff]" />
 
-                    {/* Two-column layout: inputs left, buttons right */}
-                    <form onSubmit={handleEmailAuth} className="flex flex-row gap-3">
+                    {/* Two-column layout on desktop, stack on mobile */}
+                    <form onSubmit={handleEmailAuth} className="flex flex-col sm:flex-row gap-4 sm:gap-3">
 
-                        {/* LEFT — input fields */}
+                        {/* LEFT/TOP — input fields */}
                         <div className="flex flex-col gap-3 flex-1 min-w-0">
                             {mode === 'register' && (
                                 <input
@@ -159,7 +159,7 @@ export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: L
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
                                     className="w-full bg-black/50 border border-gray-700 text-white font-mono px-3 py-2 focus:outline-none focus:border-[#00ccff] transition-colors"
-                                    style={{ fontSize: '0.8rem' }}
+                                    style={{ fontSize: '0.9rem' }}
                                 />
                             )}
                             <input
@@ -169,7 +169,7 @@ export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: L
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="w-full bg-black/50 border border-gray-700 text-white font-mono px-3 py-2 focus:outline-none focus:border-[#00ccff] transition-colors"
-                                style={{ fontSize: '0.8rem' }}
+                                style={{ fontSize: '0.9rem' }}
                             />
                             <input
                                 type="password"
@@ -178,23 +178,23 @@ export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: L
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="w-full bg-black/50 border border-gray-700 text-white font-mono px-3 py-2 focus:outline-none focus:border-[#00ccff] transition-colors"
-                                style={{ fontSize: '0.8rem' }}
+                                style={{ fontSize: '0.9rem' }}
                             />
                             {error && (
-                                <div className="text-[#ff2233] font-mono text-xs text-center border border-[#ff2233]/30 p-1 bg-[#ff2233]/10 leading-tight">
+                                <div className="text-[#ff2233] font-mono text-xs text-center border border-[#ff2233]/30 p-2 bg-[#ff2233]/10 leading-tight">
                                     {error}
                                 </div>
                             )}
                         </div>
 
-                        {/* RIGHT — action buttons */}
-                        <div className="flex flex-col gap-2 justify-between" style={{ width: '44%', minWidth: '120px' }}>
+                        {/* RIGHT/BOTTOM — action buttons */}
+                        <div className="flex flex-col gap-2 justify-between w-full sm:w-[44%] sm:min-w-[120px]">
 
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full font-display py-2 transition-all duration-200"
-                                style={{ ...btnStyle('#00ccff'), opacity: loading ? 0.5 : 1, fontSize: '0.85rem' }}
+                                className="w-full font-display py-3 sm:py-2 transition-all duration-200"
+                                style={{ ...btnStyle('#00ccff'), opacity: loading ? 0.5 : 1, fontSize: '0.9rem' }}
                                 onMouseEnter={e => !loading && btnHover('#00ccff', e.currentTarget)}
                                 onMouseLeave={e => !loading && btnLeave('#00ccff', e.currentTarget)}
                             >
@@ -210,22 +210,22 @@ export default function LoginScreen({ onLoginSuccess, initialMode = 'login' }: L
                             <button
                                 type="button"
                                 onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}
-                                className="font-mono hover:text-white transition-colors text-center leading-tight"
-                                style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem' }}
+                                className="font-mono hover:text-white transition-colors text-center leading-tight py-1"
+                                style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}
                             >
-                                {mode === 'login' ? <>CREATE<br />ACCOUNT</> : <>LOGIN TO<br />ACCOUNT</>}
+                                {mode === 'login' ? <>CREATE<br className="sm:hidden" /> ACCOUNT</> : <>LOGIN TO<br className="sm:hidden" /> ACCOUNT</>}
                             </button>
 
                             <div
-                                className="border border-gray-800 p-2 flex flex-col gap-1"
+                                className="border border-gray-800 p-2 flex flex-col gap-1 mt-1 sm:mt-0"
                                 style={{ background: 'rgba(255,255,255,0.02)' }}
                             >
                                 <button
                                     type="button"
                                     onClick={handleOfflinePlay}
                                     disabled={loading}
-                                    className="py-1.5 border border-gray-700 hover:border-[#cc33ff] hover:text-[#cc33ff] transition-colors font-mono leading-tight"
-                                    style={{ fontSize: '0.65rem' }}
+                                    className="py-2 sm:py-1.5 border border-gray-700 hover:border-[#cc33ff] hover:text-[#cc33ff] transition-colors font-mono leading-tight"
+                                    style={{ fontSize: '0.7rem' }}
                                 >
                                     PLAY OFFLINE<br />
                                     <span style={{ fontSize: '0.85em', opacity: 0.7 }}>(No Account)</span>
