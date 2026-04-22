@@ -10,6 +10,7 @@ import {
   type TerrainTexId, type PropTexId
 } from '@/lib/textureAtlas';
 import { INTERIOR_TILE_SIZE } from '@/data/interiors';
+import { useViewport } from '@/hooks/useViewport';
 
 // ─── Performance Constants ────────────────────────────────────────────────────
 const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -56,20 +57,14 @@ interface Props {
 }
 
 export default function GameCanvas({ stateRef, renderTick, WORLD_W, WORLD_H, toggleMap, onExitGame, onPause }: Props) {
-  // We use standard React state for window dimensions to keep Stage sized correctly
-  const [dimensions, setDimensions] = React.useState({ width: window.innerWidth, height: window.innerHeight });
-
-  useEffect(() => {
-    const handleResize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const viewport = useViewport();
 
   const s = stateRef.current;
   if (!s) return null;
 
-  const W = dimensions.width;
-  const H = dimensions.height;
+  const W = viewport.width;
+  const H = viewport.height;
+  const scale = viewport.scale;
   const camX = s.cameraX;
   const camY = s.cameraY;
 
@@ -78,9 +73,9 @@ export default function GameCanvas({ stateRef, renderTick, WORLD_W, WORLD_H, tog
   const shakeX = shake > 0 ? (Math.random() - 0.5) * shake : 0;
   const shakeY = shake > 0 ? (Math.random() - 0.5) * shake : 0;
 
-  // Center container translation
-  const tx = (W / 2) - camX + shakeX;
-  const ty = (H / 2) - camY + shakeY;
+  // Center container translation taking scale into account
+  const tx = (W / 2) - camX * scale + shakeX;
+  const ty = (H / 2) - camY * scale + shakeY;
 
   const parseColor = (c: string) => {
     if (!c || c === 'transparent') return { hex: 0xffaa50, alpha: 0.1 };
@@ -192,6 +187,7 @@ export default function GameCanvas({ stateRef, renderTick, WORLD_W, WORLD_H, tog
       <PixiDevTools />
       <Container
         position={[tx, ty]}
+        scale={scale}
       >
         {s.activeInterior ? (
           <>

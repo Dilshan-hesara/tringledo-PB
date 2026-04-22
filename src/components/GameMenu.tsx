@@ -9,7 +9,11 @@ export default function GameMenu({ onExit }: GameMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="absolute top-4 right-4 z-[50] flex flex-col items-end gap-2">
+    <div className="absolute z-[50] flex flex-col items-end gap-2"
+      style={{ 
+        top: 'calc(env(safe-area-inset-top, var(--sa-top, 0px)) + 1rem)', 
+        right: 'calc(env(safe-area-inset-right, var(--sa-right, 0px)) + 1rem)' 
+      }}>
       {/* 3 Dots Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
